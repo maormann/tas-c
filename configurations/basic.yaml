@@ -1,0 +1,71 @@
+---
+experiment_name: "basic"
+
+check_steps_per_round: true
+calculate_aggregated_failure_rate: true
+
+service1:
+    target_failure_rate: 0.18
+    # simple_service: true
+    failure_rate: 0.030901838378906248
+    persistent_failure_rate: 0.02
+    persistent_recovery_rate: 0.11
+    latest_probe_max: 10
+    costs: 2
+
+service2:
+    target_failure_rate: 0.11
+    failure_rate: 0.050668236083984367
+    persistent_failure_rate: 0.01
+    persistent_recovery_rate: 0.15
+    # simple_service: true
+    latest_probe_max: 8
+    costs: 3
+
+service3:
+    target_failure_rate: 0.04
+    # simple_service: true
+    failure_rate: 0.016002094726562506
+    persistent_failure_rate: 0.005
+    persistent_recovery_rate: 0.2
+    latest_probe_max: 9
+    costs: 7
+
+alarm_sender:
+    rate: "1/3"
+
+# Uncertainty Aware Controler
+uac:
+    strategy: "URC"  # Round Robin, Random, Mode 1, Mode 2, Mode 3, Mode 4, Mode 5, Mode 6, URC
+    double_check_failures: true
+# Uncertainty Reduction Controler
+urc:
+    deactivated: false
+
+model_checking:
+    run: true
+    rounds: 15
+    prism_computation_engine: "sparse"  # mtbdd, sparse, hybrid, explicit
+    # constants steps and alarms will be generated
+    properties:
+        - property: 'R{"s1_invokations"}=? [C <= steps]'
+        - property: 'R{"s2_invokations"}=? [C <= steps]'
+        - property: 'R{"s3_invokations"}=? [C <= steps]'
+        - property: 'R{"total_costs"}=? [C <= steps]'
+        - property: 'R{"model_drift"}=? [C <= steps]'
+        - property: 'R{"time_per_alarm"}=? [C <= steps] / alarms'
+
+evochecker:
+    run: false
+    dir: "TAS"
+    processors: 16
+    range_min: 3
+    range_max: 5
+    popultation_size: 10
+    max_evaluations: 100
+    objectives:
+        - property: 'R{"model_drift_abs"}=? [ C<=200 ]'
+          is_max: false
+        - property: 'R{"total_costs"}=? [ C<=200 ]'
+          is_max: false
+    constrains: []

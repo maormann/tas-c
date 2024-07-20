@@ -1,0 +1,95 @@
+---
+experiment_name: "C1_URC"
+
+service1:
+    target_failure_rate: 0.10
+    failure_rate: 0.055009382324218745
+    persistent_failure_rate: 0.005
+    persistent_recovery_rate: 0.1
+    latest_probe_max: 10
+    costs: 3.5
+
+service2:
+    target_failure_rate: 0.08
+    failure_rate: 0.043207724609375
+    persistent_failure_rate: 0.004
+    persistent_recovery_rate: 0.1
+    latest_probe_max: 10
+    costs: 4
+
+service3:
+    target_failure_rate: 0.05
+    failure_rate: 0.026249868164062506
+    persistent_failure_rate: 0.0025
+    persistent_recovery_rate: 0.1
+    latest_probe_max: 10
+    costs: 5
+
+alarm_sender:
+    rate: "1/4"
+
+# Uncertainty Aware Controler
+uac:
+    strategy: "URC"  # Round Robin, Random, Mode 1, Mode 2, Mode 3, Mode 4, Mode 5, Mode 6, URC
+    double_check_failures: false
+
+# Uncertainty Reduction Controler
+urc:
+    deactivated: false
+
+model_checking:
+    run: true
+    rounds: 100
+    # steps and alarms will be generated
+    properties:
+        - property: 'R{"s1_invokations"}=? [C <= steps]'
+        - property: 'R{"s2_invokations"}=? [C <= steps]'
+        - property: 'R{"s3_invokations"}=? [C <= steps]'
+        - property: 'R{"model_drift"}=? [C <= steps]'
+        - property: 'R{"model_drift_pessimistic"}=? [C <= steps]'
+        - property: 'R{"model_drift_optimistic"}=? [C <= steps]'
+        - property: 'R{"time_per_alarm"}=? [C <= steps] / alarms'
+
+evochecker:
+    run: false
+
+---
+experiment_name: "C1s_Round_Robbin"
+
+uac:
+    strategy: "Round Robin"
+
+---
+experiment_name: "C1_Random"
+uac:
+    strategy: "Random"
+
+---
+experiment_name: "C1_Mode_1"
+uac:
+    strategy: "Mode 1"
+
+---
+experiment_name: "C1_Mode_2"
+uac:
+    strategy: "Mode 2"
+
+---
+experiment_name: "C1_Mode_3"
+uac:
+    strategy: "Mode 3"
+
+---
+experiment_name: "C1_Mode_4"
+uac:
+    strategy: "Mode 4"
+
+---
+experiment_name: "C1_Mode_5"
+uac:
+    strategy: "Mode 5"
+
+---
+experiment_name: "C1_Mode_6"
+uac:
+    strategy: "Mode 6"

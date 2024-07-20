@@ -1,0 +1,23 @@
+const int steps = {{ model_checking.steps | default("200") }};
+const double alarms = {{ model_checking.alarms | default("20") }};
+
+//label "first_invokation" = alarm = 1 & uac_s = 2 & successful_invocation = 1;
+
+{% if evochecker_template %}
+{% for objective in evochecker.objectives %}
+//Objective, {% if objective.is_max %}max{% else %}min{% endif %}
+
+{{ objective.property }}
+
+{% endfor %}
+{% for constraint in evochecker.constrains %}
+//constraint, {% if constraint.is_max %}max{% else %}min{% endif %}, {{constraint.bound}}
+
+{{ constraint.property }}
+{% endfor %}
+
+{% else %}
+{% for property in model_checking.properties %}
+{{ property.property }}
+{% endfor %}
+{% endif %}

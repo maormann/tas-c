@@ -1,0 +1,14 @@
+dtmc
+
+const double alarm_frequency;
+
+module alarm_sender
+    s:     [0..1] init 0;    
+    alarm: [0..1] init 0;
+    []     (s = 0) -> alarm_frequency: (alarm'=1) & (s' = 1) + 1-alarm_frequency: (alarm'=0) & (s' = 1);
+    []     (s = 1) -> 1: (s' = 0);
+endmodule
+
+rewards "alarms"
+    (alarm = 1) & (s = 1): 1;
+endrewards

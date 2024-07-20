@@ -1,0 +1,10 @@
+.env
+.gitmodules
+venv
+evochecker
+.task
+data
+results
+tools
+__pycache__
+Taskfile.uni.yml

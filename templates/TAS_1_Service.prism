@@ -1,0 +1,122 @@
+{% set action1 = 'set_service1' %}
+{% set action4 = 'set_alarm_sender' %}
+{% set action5 = 'start_UAC' %}
+{% set action7 = 'end_round' %}
+{% set actions = [action1, action4, action5, action7] %}
+dtmc
+
+const double alarm_frequency = {{ alarm_sender.rate | default('1/3') }};
+
+module synchronisation
+    sync_s: [0..{{ actions | length - 1 }}] init 0;
+    {% for action in actions %}
+    {% if not loop.last %}
+    [{{ action }}] sync_s = {{ loop.index0 }} -> 1 : (sync_s'={{ loop.index }});
+    {% else %}
+    [{{ action }}] sync_s = {{ loop.index0 }} -> 1 : (sync_s'=0);
+    {% endif %}
+    {% endfor %}
+endmodule
+
+{% for service in [service1] %}
+{% if service.simple_service %}
+module {{ service.name }}
+    {{ service.state_name }}: [0..1] init {{ service.init_state | default('0', true) }};
+    [{{ actions[loop.index0] }}] true ->  {{ service.target_failure_rate }}: ({{ service.state_name }}'=1) + 1-{{ service.target_failure_rate }}: ({{ service.state_name }}'=0);
+endmodule
+{% else %}
+module {{ service.name }}
+    {{ service.state_name }}: [0..2] init {{ service.init_state | default('0', true) }};
+    [{{ actions[loop.index0] }}] {{ service.state_name }} <= 1 ->  {{ service.failure_rate }}: ({{ service.state_name }}'=1) + {{ service.persistent_failure_rate }}: ({{ service.state_name }}'=2) + 1-{{ service.failure_rate }}-{{ service.persistent_failure_rate }}: ({{ service.state_name }}'=0);
+    [{{ actions[loop.index0] }}] {{ service.state_name }} = 2  ->  {{ service.persistent_recovery_rate }}: ({{ service.state_name }}'=0) + 1-{{ service.persistent_recovery_rate }}: ({{ service.state_name }}'=2);
+endmodule
+{% endif %}
+
+{% endfor %}
+module alarm_sender
+    alarm: [0..1] init 0;
+    [{{ action4 }}] true -> alarm_frequency: (alarm'=1) + 1-alarm_frequency: (alarm'=0);
+endmodule
+
+// UAC
+module adaptation_MAPE_controller
+    uac_s: [0..2] init 0;
+    {% for service in [service1] %}
+    {{ service.state_name }}hat: [0..2] init 0;
+    {% endfor %}
+
+    [{{ action5 }}] uac_s = 0 -> (uac_s' = 1);
+
+    // Alarm
+    {% for service in [service1] %}
+    [{{ service.state_name }}_invokation] uac_s = 1 &   {{ service.state_name }}_needs_invokation & {{ service.state_name }} = 0 -> 1: (uac_s' = 2) & ({{ service.state_name }}hat' = 0);
+    [{{ service.state_name }}_invokation] uac_s = 1 &   {{ service.state_name }}_needs_invokation & {{ service.state_name }} > 0 & {{ service.state_name }}hat <= 2 -> 1: (uac_s' = 2) & ({{ service.state_name }}hat' = min(({{ service.state_name }}hat + 1),2));
+    [             ] uac_s = 1 & ! {{ service.state_name }}_needs_invokation -> 1: (uac_s' = 2);
+    {% endfor %}
+    // Reset
+    [{{ action7 }}] uac_s = 2 -> (uac_s' = 0);
+endmodule
+
+{% for service in [service1] %}
+{% if uac.double_check_failures %}
+formula {{ service.state_name }}_needs_probing = ({{ service.state_name }}hat = 1);
+{% else %}
+formula {{ service.state_name }}_needs_probing = false;
+{% endif %}
+{% endfor %}
+
+{% for service in [service1] %}
+formula {{ service.state_name }}_needs_invokation = {{ service.state_name }}_needs_probing | alarm = 1;
+{% endfor %}
+
+// Rewards
+rewards "total_invokations"
+    {% for service in [service1] %}
+    [{{ service.state_name }}_invokation] true: 1;
+    {% endfor %}
+endrewards
+
+{% for service in [service1] %}
+rewards "{{ service.state_name }}_invokations"
+    [{{ service.state_name }}_invokation] true: 1;
+endrewards
+
+{% endfor %}
+rewards "total_costs"
+    {% for service in [service1] %}
+    [{{ service.state_name }}_invokation] true: {{service.costs}};
+    {% endfor %}
+endrewards
+
+rewards "model_drift"
+    {% for service in [service1] %}
+    {% if service.simple_service %}
+    [{{ action7 }}] ({{ service.state_name }} = 0 & {{ service.state_name }}hat = 1) | ({{ service.state_name }} = 1 & {{ service.state_name }}hat = 0) | ({{ service.state_name }} = 2 & {{ service.state_name }}hat = 0) : 1;
+    {% else %}
+    [{{ action7 }}] {{ service.state_name }} != {{ service.state_name }}hat: 1;
+    {% endif %}
+    {% endfor %}
+endrewards
+
+rewards "model_drift_pessimistic"
+    {% for service in [service1] %}
+    [{{ action7 }}] {{ service.state_name }} < {{ service.state_name }}hat: 1;
+    {% endfor %}
+endrewards
+
+rewards "model_drift_optimistic"
+    {% for service in [service1] %}
+    [{{ action7 }}] {{ service.state_name }} > {{ service.state_name }}hat: 1;
+    {% endfor %}
+endrewards
+
+rewards "alarms"
+    [end_round] alarm = 1: 1;
+endrewards
+
+rewards "time_per_alarm"
+    {% for service in [service1] %}
+    [{{ service.state_name }}_invokation] alarm = 1 & {{ service.state_name }} = 0: 1;
+    [{{ service.state_name }}_invokation] alarm = 1 & {{ service.state_name }} > 0: {{ service.timeout_time | default(3) }};
+    {% endfor %}
+endrewards

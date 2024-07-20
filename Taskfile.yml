@@ -1,0 +1,141 @@
+---
+version: '3'
+
+vars:
+  DOCKER_RUN:
+    sh: test -n "${NO_DOCKER_ENV}" || printf 'docker run --rm -ti -v ./:/app -e LOGGING_LEVEL=${LOGGING_LEVEL:-info} prism'
+
+dotenv:
+  - ".env"
+
+includes:
+  uni:
+    taskfile: Taskfile.uni.yml
+    optional: true
+
+tasks:
+  help:
+    summary: List describes commands
+    cmd: FORCE_COLOR=true task --list
+    silent: true
+    aliases:
+      - default
+
+  build:
+    desc: Build the docker image and add dependencies
+    cmds:
+      - >
+        docker build
+        -t prism
+        --build-arg uid=$(id -u)
+        --build-arg gid=$(id -g)
+        {{if .prism_version}}--build-arg prism_version={{.prism_version}}{{end}}
+        {{if .prism_arch}}--build-arg prism_arch={{.prism_arch}}{{end}}
+        .
+      - task: add-parley
+      - task: build-python-dependencies
+
+  add-parley:
+    desc: Add PARLEY with git submodule
+    cmds:
+      - |
+        if test ! -d PARLEY
+        then
+        git submodule add -f -b {{.PARLEY_BRANCH}} {{.PARLEY_REPO}} PARLEY
+        fi
+      - git submodule update --recursive --remote
+    vars:
+      PARLEY_REPO: '{{default "git@github.com:maormann/PARLEY.git" .PARLEY_REPO}}'
+      PARLEY_BRANCH: '{{default "max_tas" .PARLEY_BRANCH}}'
+
+  build-python-dependencies:
+    sources:
+      - requirements.txt
+    cmds:
+      - task: build-python-virtualenv
+      - >
+        {{.DOCKER_RUN}}
+        bash -lc 'source venv/bin/activate && pip install -r requirements.txt'
+
+  build-python-virtualenv:
+    cmds:
+      - >
+        {{.DOCKER_RUN}} python3 -m venv venv
+    status:
+      - test -d venv
+    internal: true
+
+  bash:
+    desc: Run the docker execution environment
+    cmds:
+      - docker run --rm -ti -v ./:/app prism
+    aliases:
+      - sh
+      - shell
+
+  root:
+    summary: Run the docker execution environment as root
+    cmds:
+      - docker run --rm -ti -v ./:/app -u root prism
+
+  xprism:
+    desc: Run xprism (needs root)
+    summary: |
+      Only tested on linux
+    cmds:
+      - sudo xhost +local:*
+      - docker run --rm -ti -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix/ -v ./:/app prism xprism
+
+  run-prism-dice:
+    desc: Runs the dice example from PRISM
+    summary: |
+      For this example to work, the environment variable x must be set.
+      This can be done e.g. with 'x=3 task {{.TASK}}'
+    cmds:
+      - >
+        {{.DOCKER_RUN}}
+        prism -dir /opt/prism/prism-examples/simple/dice dice.pm dice.pctl -const x={{.x}} -exportresults stdout
+    requires:
+      vars:
+        - x
+
+  run-aggregated-failure-rate:
+    desc: Simple exemple for aggregated-failure-rate calculation
+    cmds:
+      - >
+        {{.DOCKER_RUN}}
+        bash -lc 'source venv/bin/activate && python3 run.py configurations/aggregated_failure_rate.yaml'
+    interactive: true
+
+  run-basic:
+    desc: Run the basic example
+    cmds:
+      - >
+        {{.DOCKER_RUN}}
+        bash -lc 'source venv/bin/activate && python3 run.py configurations/basic.yaml'
+    interactive: true
+
+  run-configuration1:
+    desc: Run all configuration1 variants
+    cmds:
+      - >
+        {{.DOCKER_RUN}}
+        bash -lc '
+        source venv/bin/activate
+        && python3 run.py configurations/configuration1.yaml
+        && python3 run.py configurations/configuration1_no_urc.yaml
+        && python3 run.py configurations/configuration1_no_urc_no_double_check_failures.yaml
+        '
+
+  lint:
+    cmds:
+      - >
+        {{.DOCKER_RUN}}
+        bash -lc '
+        source venv/bin/activate
+        && yamllint -s
+        Taskfile.yml
+        configurations/*yaml
+        '
+    aliases:
+      - check

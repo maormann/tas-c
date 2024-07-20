@@ -1,0 +1,6 @@
+Dockerfile
+.git
+.dockerignore
+.task
+venv
+__pycache__

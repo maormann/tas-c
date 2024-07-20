@@ -1,0 +1,14 @@
+dtmc
+
+const double failure_rate;
+const double persistent_failure_rate;
+const double persistent_recovery_rate;
+
+module service
+    s: [0..2] init 0;
+    [] s <= 1 ->  failure_rate: (s'=1)
+                + persistent_failure_rate: (s'=2)
+                + 1-failure_rate-persistent_failure_rate: (s'=0);
+    [] s = 2  ->  persistent_recovery_rate: (s'=0)
+                + 1-persistent_recovery_rate: (s'=2);
+endmodule

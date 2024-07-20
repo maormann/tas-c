@@ -1,0 +1,29 @@
+dtmc
+
+const double s1_failure_rate;
+const double s1_persistent_failure_rate;
+const double s1_persistent_recovery_rate;
+const double s2_failure_rate;
+const double s2_persistent_failure_rate;
+const double s2_persistent_recovery_rate;
+const double s3_failure_rate;
+const double s3_persistent_failure_rate;
+const double s3_persistent_recovery_rate;
+
+module service1
+    s1: [0..2] init 0;
+    [set_services] s1 <= 1 ->  s1_failure_rate: (s1'=1) + s1_persistent_failure_rate: (s1'=2) + 1-s1_failure_rate-s1_persistent_failure_rate: (s1'=0);
+    [set_services] s1 = 2  ->  s1_persistent_recovery_rate: (s1'=0) + 1-s1_persistent_recovery_rate: (s1'=2);
+endmodule
+
+module service2
+    s2: [0..2] init 0;
+    [set_services] s2 <= 1 ->  s2_failure_rate: (s2'=1) + s2_persistent_failure_rate: (s2'=2) + 1-s2_failure_rate-s2_persistent_failure_rate: (s2'=0);
+    [set_services] s2 = 2  ->  s2_persistent_recovery_rate: (s2'=0) + 1-s2_persistent_recovery_rate: (s2'=2);
+endmodule
+
+module service3
+    s3: [0..2] init 0;
+    [set_services] s3 <= 1 ->  s3_failure_rate: (s3'=1) + s3_persistent_failure_rate: (s3'=2) + 1-s3_failure_rate-s3_persistent_failure_rate: (s3'=0);
+    [set_services] s3 = 2  ->  s3_persistent_recovery_rate: (s3'=0) + 1-s3_persistent_recovery_rate: (s3'=2);
+endmodule

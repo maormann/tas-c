@@ -1,0 +1,77 @@
+---
+experiment_name: "FR_010"
+
+calculate_aggregated_failure_rate: true
+
+service1:
+    target_failure_rate: 0.1
+    failure_rate: 0.00999435302734375
+    persistent_failure_rate: 0.01
+    persistent_recovery_rate: 0.1
+    latest_probe_max: 10
+    costs: 2
+
+service2:
+    target_failure_rate: 0.25
+    failure_rate: 0.17499079345703128
+    persistent_failure_rate: 0.01
+    persistent_recovery_rate: 0.1
+    latest_probe_max: 10
+    costs: 2
+
+service3:
+    target_failure_rate: 0.08
+    failure_rate: 0.0790626171875
+    persistent_failure_rate: 0.001
+    persistent_recovery_rate: 0.99
+    latest_probe_max: 10
+    costs: 2
+
+---
+experiment_name: "FR_008"
+
+service1:
+    target_failure_rate: 0.08
+    failure_rate: 0.0790626171875
+    persistent_failure_rate: 0.001
+    persistent_recovery_rate: 0.99
+
+service2:
+    target_failure_rate: 0.08
+    failure_rate: 0.0790626171875
+    persistent_failure_rate: 0.001
+    persistent_recovery_rate: 0.99
+
+service3:
+    target_failure_rate: 0.08
+    failure_rate: 0.0790626171875
+    persistent_failure_rate: 0.001
+    persistent_recovery_rate: 0.99
+
+---
+experiment_name: "FR_025"
+
+service1:
+    target_failure_rate: 0.25
+    failure_rate: 0.17499079345703128
+
+service2:
+    target_failure_rate: 0.25
+    failure_rate: 0.17499079345703128
+
+service3:
+    target_failure_rate: 0.25
+    failure_rate: 0.17499079345703128
+
+---
+experiment_name: "FR_MIX"
+
+service2:
+    target_failure_rate: 0.08
+    failure_rate: 0.0790626171875
+    persistent_failure_rate: 0.001
+    persistent_recovery_rate: 0.99
+
+service3:
+    target_failure_rate: 0.25
+    failure_rate: 0.17499079345703128

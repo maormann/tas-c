@@ -1,0 +1,25 @@
+dtmc
+
+const double alarm_frequency_low;
+const double alarm_frequency_medium;
+const double alarm_frequency_high;
+
+module patient
+    risk: [0..2];
+    // 0 = low
+    // 1 = medium
+    // 2 = high
+    []     true -> 1: (risk' = 0);
+    []     true -> 1: (risk' = 1);
+    []     true -> 1: (risk' = 2);
+    endmodule
+
+module alarm_sender    
+    alarm: [0..1] init 0;
+    []     (risk = 0) -> alarm_frequency_low:      (alarm'=1)
+                       + 1-alarm_frequency_low:    (alarm'=0);
+    []     (risk = 1) -> alarm_frequency_medium:   (alarm'=1)
+                       + 1-alarm_frequency_medium: (alarm'=0);
+    []     (risk = 2) -> alarm_frequency_high:     (alarm'=1)
+                       + 1-alarm_frequency_high:   (alarm'=0);
+endmodule
