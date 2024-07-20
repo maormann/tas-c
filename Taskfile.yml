@@ -51,11 +51,16 @@ tasks:
   build-python-dependencies:
     sources:
       - requirements.txt
+      - PARLEY/requirements.txt
     cmds:
       - task: build-python-virtualenv
       - >
         {{.DOCKER_RUN}}
-        bash -lc 'source venv/bin/activate && pip install -r requirements.txt'
+        bash -lc '
+        source venv/bin/activate
+        && pip install -r requirements.txt
+        && pip install -r PARLEY/requirements.txt
+        '
 
   build-python-virtualenv:
     cmds:
