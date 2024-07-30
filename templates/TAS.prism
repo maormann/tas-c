@@ -11,6 +11,8 @@ dtmc
 {% for service in [service1, service2, service3] %}
 {% if evochecker_template %}
 evolve param int {{ service.state_name }}_latest_probe_max [{{ evochecker.range_min }} .. {{ evochecker.range_max }}];
+{% elif compute_baseline %}
+const int {{ service.state_name }}_latest_probe_max;
 {% else %}
 const int {{ service.state_name }}_latest_probe_max = {{ service.latest_probe_max | default('20') }};
 {% endif %}
