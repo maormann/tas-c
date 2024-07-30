@@ -64,6 +64,8 @@ class Experiment:
             self.check_steps_per_round()  # needs PRISM
         if self.config["calculate_aggregated_failure_rate"]:
             self.calculate_aggregated_failure_rate()  # needs PRISM
+        if self.config["calculate_baseline"]:
+            self.calculate_baseline()  # needs PRISM
         if self.config["model_checking"]["run"]:
             self.run_model_checking()
         if self.config["evochecker"]["run"]:
@@ -93,6 +95,13 @@ class Experiment:
         with open(file_path, 'w') as config_file:
             config_file.write(yaml.safe_dump(self.config))
 
+    def generate_evochecker_config(self):
+        if "model_template_file" not in self.config['evochecker']:
+            self.config['evochecker'] = os.path.join(self.dir, "evochecker", "TAS_evochecker.prism")
+        if "properties_file" not in self.config['evochecker']:
+            self.config['evochecker'] = os.path.join(self.dir, "evochecker", "TAS_evochecker.props")
+        self.generate_file_from_template("evochecker.properties", os.path.join("evochecker", "evochecker.properties"))
+
     def generate_model(self):
         self.generate_file_from_template("TAS.prism")
         self.generate_file_from_template("TAS.props")
@@ -100,13 +109,10 @@ class Experiment:
         self.generate_file_from_template("TAS.prism", os.path.join("evochecker", "TAS_evochecker.prism"))
         self.generate_file_from_template("TAS.props", os.path.join("evochecker", "TAS_evochecker.props"))
         self.config['evochecker_template'] = False
-
-    def generate_evochecker_config(self):
-        if "model_template_file" not in self.config['evochecker']:
-            self.config['evochecker'] = os.path.join(self.dir, "evochecker", "TAS_evochecker.prism")
-        if "properties_file" not in self.config['evochecker']:
-            self.config['evochecker'] = os.path.join(self.dir, "evochecker", "TAS_evochecker.props")
-        self.generate_file_from_template("evochecker.properties", os.path.join("evochecker", "evochecker.properties"))
+        self.config['compute_baseline'] = True
+        self.generate_file_from_template("TAS.prism", os.path.join("baseline", "TAS_baseline.prism"))
+        self.generate_file_from_template("TAS.props", os.path.join("baseline", "TAS_baseline.props"))
+        self.config['compute_baseline'] = False
 
     def generate_file_from_template(self, filename, target_filename=""):
         target_filename = target_filename if target_filename else filename
@@ -120,6 +126,7 @@ class Experiment:
         directory_path = os.path.join(final_results_path, "experiments", self.name)
         os.makedirs(directory_path)
         os.makedirs(os.path.join(directory_path, "evochecker"))
+        os.makedirs(os.path.join(directory_path, "baseline"))
         os.makedirs(os.path.join(directory_path, "results"))
         self.final_results_dir = final_results_path
         self.dir = directory_path
@@ -159,6 +166,8 @@ class Experiment:
         self.config["model_checking"]["alarms"] = int(self.config["model_checking"]["rounds"]) * float(Fraction(self.config["alarm_sender"]["rate"]))
         if "calculate_aggregated_failure_rate" not in self.config:
             self.config["calculate_aggregated_failure_rate"] = False
+        if "calculate_baseline" not in self.config:
+            self.config["calculate_baseline"] = False
         if "check_steps_per_round" not in self.config:
             self.config["check_steps_per_round"] = False
         self.calculate_persistent_failue_service()
@@ -380,6 +389,23 @@ class Experiment:
         # for so in configurations:
         #     print(so.order, "mode=", so.mode, "s1_np=", so.s1_np, "s2_np=", so.s2_np, "s3_np=", so.s3_np, "s1_pf=", so.s1_pf, "s2_pf=", so.s2_pf, "s3_pf=", so.s3_pf)
         self.config['configurations'] = configurations
+
+    def calculate_baseline(self):
+        self.log_info('Starting baseline calculation')
+        cmd = (f'prism {os.path.join(self.dir, "baseline", "TAS_baseline.prism")} '
+               f'{os.path.join(self.dir, "baseline", "TAS_baseline.props")} '
+               f'-{self.config["model_checking"]["prism_computation_engine"]} '
+               f'-const s1_latest_probe_max=1:{self.config["service1"]["latest_probe_max"]} '
+               f'-const s2_latest_probe_max=1:{self.config["service2"]["latest_probe_max"]} '
+               f'-const s3_latest_probe_max=1:{self.config["service3"]["latest_probe_max"]} '
+               f'-exportresults {os.path.join(self.dir, "results", "baseline_prism.txt")}')
+        results = get_prism_results(cmd)
+        # Parley Baseline adapter
+        with open(os.path.join(self.dir, "results", "Front"), 'w') as front_file:
+            for i in range(0, len(results), 2):
+                front_file.write(f'{results[i].split()[0]}\t{results[i+1].split()[0]}')
+                if i < len(results) - 2:
+                    front_file.write('\n')
 
     def run_model_checking(self):
         self.log_info('Starting model checking')
