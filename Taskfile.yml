@@ -3,7 +3,7 @@ version: '3'
 
 vars:
   DOCKER_RUN:
-    sh: test -n "${NO_DOCKER_ENV}" || printf 'docker run --rm -ti -v ./:/app -e LOGGING_LEVEL=${LOGGING_LEVEL:-info} prism'
+    sh: test -n ${NO_DOCKER_ENV} || printf 'docker run --rm -ti -v ./:/app -e LOGGING_LEVEL=${LOGGING_LEVEL:-info} prism'
 
 dotenv:
   - ".env"
