@@ -46,7 +46,7 @@ tasks:
         fi
       - git submodule update --recursive --remote
     vars:
-      PARLEY_REPO: '{{default "git@github.com:maormann/PARLEY.git" .PARLEY_REPO}}'
+      PARLEY_REPO: '{{default "https://github.com/maormann/PARLEY.git" .PARLEY_REPO}}'
       PARLEY_BRANCH: '{{default "max_tas" .PARLEY_BRANCH}}'
 
   build-python-dependencies:
