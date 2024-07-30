@@ -1,0 +1,14 @@
+---
+version: "3"
+
+tasks:
+  run-tas:
+    desc: Run tas.py
+    cmds:
+      - >
+        {{.DOCKER_RUN}}
+        bash -lc '
+        source venv/bin/activate
+        && cd PARLEY
+        && python3 tas.py
+        '
