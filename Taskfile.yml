@@ -3,7 +3,7 @@ version: '3'
 
 vars:
   DOCKER_RUN:
-    sh: test -n ${NO_DOCKER_ENV} || printf 'docker run --rm -ti -v ./:/app -e LOGGING_LEVEL=${LOGGING_LEVEL:-info} prism'
+    sh: test -z ${NO_DOCKER_ENV} && printf 'docker run --rm -ti -v ./:/app -e LOGGING_LEVEL=${LOGGING_LEVEL:-info} prism'
 
 dotenv:
   - ".env"
@@ -40,8 +40,7 @@ tasks:
     desc: Add PARLEY with git submodule
     cmds:
       - |
-        if test ! -d PARLEY
-        then
+        if test ! -d PARLEY; then
         git submodule add -f -b {{.PARLEY_BRANCH}} {{.PARLEY_REPO}} PARLEY
         fi
       - git submodule update --recursive --remote
