@@ -1,0 +1,51 @@
+---
+experiment_name: "C1_BASELINE"
+
+service1:
+    target_failure_rate: 0.10
+    failure_rate: 0.055009382324218745
+    persistent_failure_rate: 0.005
+    persistent_recovery_rate: 0.1
+    latest_probe_max: 15
+    costs: 3.5
+
+service2:
+    target_failure_rate: 0.08
+    failure_rate: 0.043207724609375
+    persistent_failure_rate: 0.004
+    persistent_recovery_rate: 0.1
+    latest_probe_max: 15
+    costs: 4
+
+service3:
+    target_failure_rate: 0.05
+    failure_rate: 0.026249868164062506
+    persistent_failure_rate: 0.0025
+    persistent_recovery_rate: 0.1
+    latest_probe_max: 15
+    costs: 5
+
+alarm_sender:
+    rate: "1/4"
+
+# Uncertainty Aware Controler
+uac:
+    strategy: "URC"  # Round Robin, Random, Mode 1, Mode 2, Mode 3, Mode 4, Mode 5, Mode 6, URC
+    double_check_failures: true
+
+# Uncertainty Reduction Controler
+urc:
+    deactivated: false
+
+calculate_baseline: true
+
+model_checking:
+    run: false
+    rounds: 100
+    # steps and alarms will be generated
+    properties:
+        - property: 'R{"total_costs"}=? [C <= steps]'
+        - property: 'R{"time_per_alarm"}=? [C <= steps] / alarms'
+
+evochecker:
+    run: false
