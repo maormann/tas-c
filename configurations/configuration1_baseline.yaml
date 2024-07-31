@@ -41,7 +41,7 @@ calculate_baseline: true
 
 model_checking:
     run: false
-    rounds: 100
+    rounds: 30
     # steps and alarms will be generated
     properties:
         - property: 'R{"total_costs"}=? [C <= steps]'
