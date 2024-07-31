@@ -1,29 +1,29 @@
 ---
-experiment_name: "C1_URC"
+experiment_name: "C4_URC"
 
 service1:
-    target_failure_rate: 0.10
-    failure_rate: 0.055009382324218745
+    target_failure_rate: 0.20
+    failure_rate: 0.11999911743164066
     persistent_failure_rate: 0.005
-    persistent_recovery_rate: 0.1
+    persistent_recovery_rate: 0.05
     latest_probe_max: 10
     costs: 3.5
 
 service2:
-    target_failure_rate: 0.08
-    failure_rate: 0.043207724609375
-    persistent_failure_rate: 0.004
-    persistent_recovery_rate: 0.1
+    target_failure_rate: 0.10
+    failure_rate: 0.025007500000000002
+    persistent_failure_rate: 0.0025
+    persistent_recovery_rate: 0.03
     latest_probe_max: 10
-    costs: 4
+    costs: 7
 
 service3:
-    target_failure_rate: 0.05
-    failure_rate: 0.026249868164062506
-    persistent_failure_rate: 0.0025
-    persistent_recovery_rate: 0.1
+    target_failure_rate: 0.16
+    failure_rate: 0.07600134399414064
+    persistent_failure_rate: 0.004
+    persistent_recovery_rate: 0.04
     latest_probe_max: 10
-    costs: 5
+    costs: 10
 
 alarm_sender:
     rate: "1/4"
@@ -55,42 +55,42 @@ evochecker:
     run: false
 
 ---
-experiment_name: "C1_Round_Robbin"
+experiment_name: "C3_Round_Robbin"
 
 uac:
     strategy: "Round Robin"
 
 ---
-experiment_name: "C1_Random"
+experiment_name: "C3_Random"
 uac:
     strategy: "Random"
 
 ---
-experiment_name: "C1_Mode_1"
+experiment_name: "C3_Mode_1"
 uac:
     strategy: "Mode 1"
 
 ---
-experiment_name: "C1_Mode_2"
+experiment_name: "C3_Mode_2"
 uac:
     strategy: "Mode 2"
 
 ---
-experiment_name: "C1_Mode_3"
+experiment_name: "C3_Mode_3"
 uac:
     strategy: "Mode 3"
 
 ---
-experiment_name: "C1_Mode_4"
+experiment_name: "C3_Mode_4"
 uac:
     strategy: "Mode 4"
 
 ---
-experiment_name: "C1_Mode_5"
+experiment_name: "C3_Mode_5"
 uac:
     strategy: "Mode 5"
 
 ---
-experiment_name: "C1_Mode_6"
+experiment_name: "C3_Mode_6"
 uac:
     strategy: "Mode 6"

@@ -133,13 +133,51 @@ tasks:
         '
 
   run-configuration1-baseline:
-    desc: Run configuration1 baseline calulation
+    desc: Run configuration 1 baseline calulation
     cmds:
       - >
         {{.DOCKER_RUN}}
         bash -lc '
         source venv/bin/activate
         && python3 run.py configurations/configuration1_baseline.yaml
+        '
+
+  run-configuration2:
+    desc: Run configuration 2
+    summary: |
+      configuration 2 has higher failure rate
+      lower recovery rate
+      and dirrefent costs per service
+    cmds:
+      - >
+        {{.DOCKER_RUN}}
+        bash -lc '
+        source venv/bin/activate
+        && python3 run.py configurations/configuration2.yaml
+        '
+
+  run-configuration3:
+    desc: Run configuration 3
+    summary: configuration 3 is a copy of c2 with a lower alarm rate
+    cmds:
+      - >
+        {{.DOCKER_RUN}}
+        bash -lc '
+        source venv/bin/activate
+        && python3 run.py configurations/configuration3.yaml
+        '
+
+  run-configuration4:
+    desc: Run configuration 4
+    summary: |
+      configuration 4 is a copy of c2 where s2 is better and ceaper than s3
+      the failure rates of s2 and s3 are swaped
+    cmds:
+      - >
+        {{.DOCKER_RUN}}
+        bash -lc '
+        source venv/bin/activate
+        && python3 run.py configurations/configuration4.yaml
         '
 
   lint:
