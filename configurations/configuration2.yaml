@@ -38,7 +38,7 @@ urc:
     deactivated: false
 
 model_checking:
-    run: false
+    run: true
     rounds: 30
     # steps and alarms will be generated
     properties:
