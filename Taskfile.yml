@@ -129,6 +129,7 @@ tasks:
         source venv/bin/activate
         && python3 run.py configurations/configuration1.yaml
         && python3 run.py configurations/configuration1_no_urc.yaml
+        && python3 run.py configurations/configuration1_no_double_check_failures.yaml
         && python3 run.py configurations/configuration1_no_urc_no_double_check_failures.yaml
         '
 
