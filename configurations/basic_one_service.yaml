@@ -45,7 +45,7 @@ model_checking:
     prism_computation_engine: "sparse"  # mtbdd, sparse, hybrid, explicit
     # constants steps and alarms will be generated
     properties:
-        - property: 'R{"s1_invokations"}=? [C <= steps]'
+        - property: 'R{"s1_invocations"}=? [C <= steps]'
         - property: 'R{"total_costs"}=? [C <= steps]'
         - property: 'R{"model_drift"}=? [C <= steps]'
         - property: 'R{"time_per_alarm"}=? [C <= steps] / alarms'

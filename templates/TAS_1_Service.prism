@@ -49,9 +49,9 @@ module adaptation_MAPE_controller
 
     // Alarm
     {% for service in [service1] %}
-    [{{ service.state_name }}_invokation] uac_s = 1 &   {{ service.state_name }}_needs_invokation & {{ service.state_name }} = 0 -> 1: (uac_s' = 2) & ({{ service.state_name }}hat' = 0);
-    [{{ service.state_name }}_invokation] uac_s = 1 &   {{ service.state_name }}_needs_invokation & {{ service.state_name }} > 0 & {{ service.state_name }}hat <= 2 -> 1: (uac_s' = 2) & ({{ service.state_name }}hat' = min(({{ service.state_name }}hat + 1),2));
-    [             ] uac_s = 1 & ! {{ service.state_name }}_needs_invokation -> 1: (uac_s' = 2);
+    [{{ service.state_name }}_invocation] uac_s = 1 &   {{ service.state_name }}_needs_invocation & {{ service.state_name }} = 0 -> 1: (uac_s' = 2) & ({{ service.state_name }}hat' = 0);
+    [{{ service.state_name }}_invocation] uac_s = 1 &   {{ service.state_name }}_needs_invocation & {{ service.state_name }} > 0 & {{ service.state_name }}hat <= 2 -> 1: (uac_s' = 2) & ({{ service.state_name }}hat' = min(({{ service.state_name }}hat + 1),2));
+    [             ] uac_s = 1 & ! {{ service.state_name }}_needs_invocation -> 1: (uac_s' = 2);
     {% endfor %}
     // Reset
     [{{ action7 }}] uac_s = 2 -> (uac_s' = 0);
@@ -66,25 +66,25 @@ formula {{ service.state_name }}_needs_probing = false;
 {% endfor %}
 
 {% for service in [service1] %}
-formula {{ service.state_name }}_needs_invokation = {{ service.state_name }}_needs_probing | alarm = 1;
+formula {{ service.state_name }}_needs_invocation = {{ service.state_name }}_needs_probing | alarm = 1;
 {% endfor %}
 
 // Rewards
-rewards "total_invokations"
+rewards "total_invocations"
     {% for service in [service1] %}
-    [{{ service.state_name }}_invokation] true: 1;
+    [{{ service.state_name }}_invocation] true: 1;
     {% endfor %}
 endrewards
 
 {% for service in [service1] %}
-rewards "{{ service.state_name }}_invokations"
-    [{{ service.state_name }}_invokation] true: 1;
+rewards "{{ service.state_name }}_invocations"
+    [{{ service.state_name }}_invocation] true: 1;
 endrewards
 
 {% endfor %}
 rewards "total_costs"
     {% for service in [service1] %}
-    [{{ service.state_name }}_invokation] true: {{service.costs}};
+    [{{ service.state_name }}_invocation] true: {{service.costs}};
     {% endfor %}
 endrewards
 
@@ -116,7 +116,7 @@ endrewards
 
 rewards "time_per_alarm"
     {% for service in [service1] %}
-    [{{ service.state_name }}_invokation] alarm = 1 & {{ service.state_name }} = 0: 1;
-    [{{ service.state_name }}_invokation] alarm = 1 & {{ service.state_name }} > 0: {{ service.timeout_time | default(3) }};
+    [{{ service.state_name }}_invocation] alarm = 1 & {{ service.state_name }} = 0: 1;
+    [{{ service.state_name }}_invocation] alarm = 1 & {{ service.state_name }} > 0: {{ service.timeout_time | default(3) }};
     {% endfor %}
 endrewards

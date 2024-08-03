@@ -54,9 +54,9 @@ The standard configuration shows how to verify properties of the PRSIM model dir
     prism_computation_engine: "sparse"  # mtbdd, sparse, hybrid, explicit
     # constants steps and alarms will be generated
     properties:
-        - property: 'R{"s1_invokations"}=? [C <= steps]'
-        - property: 'R{"s2_invokations"}=? [C <= steps]'
-        - property: 'R{"s3_invokations"}=? [C <= steps]'
+        - property: 'R{"s1_invocations"}=? [C <= steps]'
+        - property: 'R{"s2_invocations"}=? [C <= steps]'
+        - property: 'R{"s3_invocations"}=? [C <= steps]'
         - property: 'R{"total_costs"}=? [C <= steps]'
         - property: 'R{"model_drift"}=? [C <= steps]'
         - property: 'R{"time_per_alarm"}=? [C <= steps] / alarms'

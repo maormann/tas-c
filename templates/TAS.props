@@ -1,7 +1,7 @@
 const int steps = {{ model_checking.steps | default("200") }};
 const double alarms = {{ model_checking.alarms | default("20") }};
 
-//label "first_invokation" = alarm = 1 & uac_s = 2 & successful_invocation = 1;
+//label "first_invocation" = alarm = 1 & uac_s = 2 & successful_invocation = 1;
 
 {% if evochecker_template %}
 {% for objective in evochecker.objectives %}

@@ -42,9 +42,9 @@ model_checking:
     rounds: 30
     # steps and alarms will be generated
     properties:
-        - property: 'R{"s1_invokations"}=? [C <= steps]'
-        - property: 'R{"s2_invokations"}=? [C <= steps]'
-        - property: 'R{"s3_invokations"}=? [C <= steps]'
+        - property: 'R{"s1_invocations"}=? [C <= steps]'
+        - property: 'R{"s2_invocations"}=? [C <= steps]'
+        - property: 'R{"s3_invocations"}=? [C <= steps]'
         - property: 'R{"model_drift"}=? [C <= steps]'
         - property: 'R{"model_drift_pessimistic"}=? [C <= steps]'
         - property: 'R{"model_drift_optimistic"}=? [C <= steps]'

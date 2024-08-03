@@ -97,9 +97,9 @@ module adaptation_MAPE_controller
     {% set mode = loop.index %}
     // Mode {{ mode }}
     {% for service in services %}
-    [{{ service.state_name }}_invokation] mode = {{ mode }} & uac_s = {{ loop.index }} &   {{ service.state_name }}_needs_invokation & {{ service.state_name }} = 0 -> 1: (uac_s' = {{ loop.index + 1 }}) & (successful_invocation' = 1);
-    [{{ service.state_name }}_invokation] mode = {{ mode }} & uac_s = {{ loop.index }} &   {{ service.state_name }}_needs_invokation & {{ service.state_name }} > 0 -> 1: (uac_s' = {{ loop.index + 1 }});
-    [             ] mode = {{ mode }} & uac_s = {{ loop.index }} & ! {{ service.state_name }}_needs_invokation -> 1: (uac_s' = {{ loop.index + 1 }});
+    [{{ service.state_name }}_invocation] mode = {{ mode }} & uac_s = {{ loop.index }} &   {{ service.state_name }}_needs_invocation & {{ service.state_name }} = 0 -> 1: (uac_s' = {{ loop.index + 1 }}) & (successful_invocation' = 1);
+    [{{ service.state_name }}_invocation] mode = {{ mode }} & uac_s = {{ loop.index }} &   {{ service.state_name }}_needs_invocation & {{ service.state_name }} > 0 -> 1: (uac_s' = {{ loop.index + 1 }});
+    [             ] mode = {{ mode }} & uac_s = {{ loop.index }} & ! {{ service.state_name }}_needs_invocation -> 1: (uac_s' = {{ loop.index + 1 }});
     {% endfor %}
     {% endfor %}
     // Reset
@@ -112,8 +112,8 @@ module Knowledge
     {% endfor %}
 
     {% for service in [service1, service2, service3] %}
-    [{{ service.state_name }}_invokation] {{ service.state_name }} = 0 -> ({{ service.state_name }}hat' = 0);
-    [{{ service.state_name }}_invokation] {{ service.state_name }} > 0 & {{ service.state_name }}hat <= 2 -> ({{ service.state_name }}hat' = min(({{ service.state_name }}hat + 1),2));
+    [{{ service.state_name }}_invocation] {{ service.state_name }} = 0 -> ({{ service.state_name }}hat' = 0);
+    [{{ service.state_name }}_invocation] {{ service.state_name }} > 0 & {{ service.state_name }}hat <= 2 -> ({{ service.state_name }}hat' = min(({{ service.state_name }}hat + 1),2));
     //[update_{{ service.state_name }}] true -> ({{ service.state_name }}hat' = {{ service.state_name }});
     {% endfor %}
 endmodule
@@ -126,7 +126,7 @@ module uncertainty_reduction_controller
     {% endfor %}
 
     {% for service in [service1, service2, service3] %}
-    [{{ service.state_name }}_invokation] (sync_s = 5) -> 1: ({{ service.state_name }}_latest_probe' = 0);
+    [{{ service.state_name }}_invocation] (sync_s = 5) -> 1: ({{ service.state_name }}_latest_probe' = 0);
     {% endfor %}
 
     {% if urc.deactivated %}
@@ -146,25 +146,25 @@ formula {{ service.state_name }}_needs_probing = {{ service.state_name }}_latest
 {% endfor %}
 
 {% for service in [service1, service2, service3] %}
-formula {{ service.state_name }}_needs_invokation = {{ service.state_name }}_needs_probing | (alarm = 1 & successful_invocation = 0);
+formula {{ service.state_name }}_needs_invocation = {{ service.state_name }}_needs_probing | (alarm = 1 & successful_invocation = 0);
 {% endfor %}
 
 // Rewards
-rewards "total_invokations"
+rewards "total_invocations"
     {% for service in [service1, service2, service3] %}
-    [{{ service.state_name }}_invokation] true: 1;
+    [{{ service.state_name }}_invocation] true: 1;
     {% endfor %}
 endrewards
 
 {% for service in [service1, service2, service3] %}
-rewards "{{ service.state_name }}_invokations"
-    [{{ service.state_name }}_invokation] true: 1;
+rewards "{{ service.state_name }}_invocations"
+    [{{ service.state_name }}_invocation] true: 1;
 endrewards
 
 {% endfor %}
 rewards "total_costs"
     {% for service in [service1, service2, service3] %}
-    [{{ service.state_name }}_invokation] true: {{service.costs}};
+    [{{ service.state_name }}_invocation] true: {{service.costs}};
     {% endfor %}
 endrewards
 
@@ -196,7 +196,7 @@ endrewards
 
 rewards "time_per_alarm"
     {% for service in [service1, service2, service3] %}
-    [{{ service.state_name }}_invokation] alarm = 1 & successful_invocation = 0 & {{ service.state_name }} = 0: 1;
-    [{{ service.state_name }}_invokation] alarm = 1 & successful_invocation = 0 & {{ service.state_name }} > 0: {{ service.timeout_time | default(3) }};
+    [{{ service.state_name }}_invocation] alarm = 1 & successful_invocation = 0 & {{ service.state_name }} = 0: 1;
+    [{{ service.state_name }}_invocation] alarm = 1 & successful_invocation = 0 & {{ service.state_name }} > 0: {{ service.timeout_time | default(3) }};
     {% endfor %}
 endrewards
