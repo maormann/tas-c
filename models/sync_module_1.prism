@@ -1,0 +1,38 @@
+dtmc
+
+const double alarm_frequency = 1/4;
+
+module synchronisation
+    sync_s: [0..4] init 0;
+    [set_service1] sync_s = 0 -> 1 : (sync_s'=1);
+    [set_service2] sync_s = 1 -> 1 : (sync_s'=2);
+    [set_service3] sync_s = 2 -> 1 : (sync_s'=3);
+    [set_alarm_sender] sync_s = 3 -> 1 : (sync_s'=4);
+    [] sync_s = 4 -> 1 : (sync_s'=0);
+endmodule
+
+module service1
+    s1: [0..2] init 0;
+    [set_service1] s1 <= 1 ->  0.055009382324218745: (s1'=1) + 0.005: (s1'=2) + 1-0.055009382324218745-0.005: (s1'=0);
+    [set_service1] s1 = 2  ->  0.1: (s1'=0) + 1-0.1: (s1'=2);
+endmodule
+
+module service2
+    s2: [0..2] init 0;
+    [set_service2] s2 <= 1 ->  0.043207724609375: (s2'=1) + 0.004: (s2'=2) + 1-0.043207724609375-0.004: (s2'=0);
+    [set_service2] s2 = 2  ->  0.1: (s2'=0) + 1-0.1: (s2'=2);
+endmodule
+
+module service3
+    s3: [0..2] init 0;
+    [set_service3] s3 <= 1 ->  0.026249868164062506: (s3'=1) + 0.0025: (s3'=2) + 1-0.026249868164062506-0.0025: (s3'=0);
+    [set_service3] s3 = 2  ->  0.1: (s3'=0) + 1-0.1: (s3'=2);
+endmodule
+
+module alarm_sender
+    alarm: [0..1] init 0;
+    [set_alarm_sender] true -> alarm_frequency: (alarm'=1) + 1-alarm_frequency: (alarm'=0);
+endmodule
+
+const int steps_per_round = 5;
+label "desaster" = sync_s=4 & s1>0 & s2>0 & s3>0 & alarm=1;

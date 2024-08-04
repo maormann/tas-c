@@ -1,0 +1,4 @@
+const int rounds;
+
+P=? [ F<=(rounds*steps_per_round)-1 "desaster" ]
+
