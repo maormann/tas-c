@@ -1,0 +1,10 @@
+dtmc
+
+module cat
+   //variables
+   good_mood:[0..1] init 1;
+
+   //transitions
+   [] good_mood=0 -> 0.55:(good_mood'=1) + 0.45:(good_mood'=0);
+   [] good_mood=1 -> 0.7 :(good_mood'=1) + 0.3 :(good_mood'=0);
+endmodule
