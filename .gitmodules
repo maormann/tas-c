@@ -1,0 +1,4 @@
+[submodule "PARLEY"]
+	path = PARLEY
+	url = git@github.com:maormann/PARLEY.git
+	branch = max_tas
