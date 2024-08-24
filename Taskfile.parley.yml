@@ -12,3 +12,26 @@ tasks:
         && cd PARLEY
         && python3 tas.py
         '
+
+  evochecker-build:
+    desc: Build Evochecker
+    cmds:
+      - mvn install
+    dir: PARLEY/Applications/EvoChecker-master
+
+  evochecker-run:
+    desc: Run Evochecker witch config
+    summary: |-
+      EVOCHECKER_CONFIG default is config.properties
+    cmds:
+      - >-
+        java
+        -Djava.awt.headless=true
+        -jar
+        target/EvoChecker-1.1.0.jar
+        {{.EVOCHECKER_CONFIG}}
+    vars:
+      LD_LIBRARY_PATH: libs/runtime
+      EVOCHECKER_CONFIG: >-
+        {{.EVOCHECKER_CONFIG | default "config.properties"}}
+    dir: PARLEY/Applications/EvoChecker-master
