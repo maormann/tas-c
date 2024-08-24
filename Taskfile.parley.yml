@@ -16,7 +16,9 @@ tasks:
   evochecker-build:
     desc: Build Evochecker
     cmds:
-      - mvn install
+      - >-
+        {{.DOCKER_RUN}}
+        mvn install
     dir: PARLEY/Applications/EvoChecker-master
 
   evochecker-run:
@@ -25,15 +27,21 @@ tasks:
       EVOCHECKER_CONFIG default is config.properties
     cmds:
       - >-
-        unset DISPLAY &&
-        java
-        -Djava.awt.headless=true
-        -jar
-        target/EvoChecker-1.1.0.jar
-        {{.EVOCHECKER_CONFIG}}
+        {{if not .NO_DOCKER_ENV}}
+        docker run --rm -ti
+        -v ./:/app
+        -e LOGGING_LEVEL=${LOGGING_LEVEL:-info}
+        -e LD_LIBRARY_PATH=libs/runtime
+        prism bash -lc '{{.RUN_SCRIPT}}'
+        {{else}}
+        {{.RUN_SCRIPT}}
+        {{end}}
     env:
       LD_LIBRARY_PATH: libs/runtime
     vars:
       EVOCHECKER_CONFIG: >-
         {{.EVOCHECKER_CONFIG | default "config.properties"}}
+      RUN_SCRIPT: >-
+        unset DISPLAY &&
+        java -jar target/EvoChecker-1.1.0.jar {{.EVOCHECKER_CONFIG}}
     dir: PARLEY/Applications/EvoChecker-master
