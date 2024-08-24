@@ -25,6 +25,7 @@ tasks:
       EVOCHECKER_CONFIG default is config.properties
     cmds:
       - >-
+        unset DISPLAY &&
         java
         -Djava.awt.headless=true
         -jar
