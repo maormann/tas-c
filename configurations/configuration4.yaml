@@ -55,42 +55,42 @@ evochecker:
     run: false
 
 ---
-experiment_name: "C3_Round_Robbin"
+experiment_name: "C4_Round_Robbin"
 
 uac:
     strategy: "Round Robin"
 
 ---
-experiment_name: "C3_Random"
+experiment_name: "C4_Random"
 uac:
     strategy: "Random"
 
 ---
-experiment_name: "C3_Mode_1"
+experiment_name: "C4_Mode_1"
 uac:
     strategy: "Mode 1"
 
 ---
-experiment_name: "C3_Mode_2"
+experiment_name: "C4_Mode_2"
 uac:
     strategy: "Mode 2"
 
 ---
-experiment_name: "C3_Mode_3"
+experiment_name: "C4_Mode_3"
 uac:
     strategy: "Mode 3"
 
 ---
-experiment_name: "C3_Mode_4"
+experiment_name: "C4_Mode_4"
 uac:
     strategy: "Mode 4"
 
 ---
-experiment_name: "C3_Mode_5"
+experiment_name: "C4_Mode_5"
 uac:
     strategy: "Mode 5"
 
 ---
-experiment_name: "C3_Mode_6"
+experiment_name: "C4_Mode_6"
 uac:
     strategy: "Mode 6"
