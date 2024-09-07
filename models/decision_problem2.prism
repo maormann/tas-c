@@ -1,0 +1,37 @@
+dtmc
+
+const int decision_0 = 1;
+const int decision_1 = 0;
+
+module service
+  x: [0..1] init 0;
+  [] true -> 1/2: (x' = 0) + 1/2: (x' = 1); 
+endmodule
+
+module Knowledge
+  xhat: [0..1] init 0;
+  [update_urs_1] true -> (xhat' = x);
+  [update_urs_2] true -> (xhat' = x);
+endmodule
+
+module URC
+  //[update_urs_1] decision_urs_1 = 1 -> true;
+  //[update_urs_2] decision_urs_2 = 1 -> true;
+endmodule
+
+formula decision_urs_1 = xhat = 0 ? decision_0 : decision_1;
+formula decision_urs_2 = xhat = 0 ? decision_0 : decision_1;
+
+module Turn
+  t: [0..3] init 0;
+  d_urs_1: [0..1] init 0;
+  d_urs_2: [0..1] init 0;
+  [] t=0 -> (t'=1) & (d_urs_1'=decision_urs_1) & (d_urs_2'=decision_urs_2);
+
+  [update_urs_1]    t=1 & (d_urs_1 = 1) -> (t'=2) ;
+  [no_update_urs_1] t=1 & (d_urs_1 = 0) -> (t'=2);
+  [update_urs_2]    t=2 & (d_urs_2 = 1) -> (t'=3);
+  [no_update_urs_1] t=2 & (d_urs_2 = 0) -> (t'=3);
+
+  [] t=3 -> (t'=0);
+endmodule
